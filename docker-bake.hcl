@@ -24,31 +24,45 @@ function "cache_multi_platform" {
 
 # Single-platform targets.
 # Requires creating multi-platform manifest list manually.
-target "aptos" {
+target "aptos-node" {
   platforms = [PLATFORM]
-  target = "aptos"
+  target = "aptos-node"
   output = ["type=image"]
   args = {
     APTOS_GIT_REVISION = APTOS_GIT_REVISION
   }
+  tags = tags("aptos-node")
+  cache-from = [cache("aptos-node")] # always merged with children's cache-from
+  cache-to = ["${cache("aptos-node")},mode=max"]
+}
+
+target "aptos" {
+  inherits = ["aptos-node"]
+  target = "aptos"
   tags = tags("aptos")
-  cache-from = [cache("aptos")] # always merged with children's cache-from
-  cache-to = ["${cache("aptos")},mode=max"]
+  # Sharing the same cache with aptos-node
 }
 
 target "default" {
-  inherits = ["aptos"]
+  inherits = ["aptos-node"]
 }
 
 # Multi-platform targets.
-target "aptos-multi-platform" {
+target "aptos-node-multi-platform" {
   platforms = ["linux/amd64", "linux/arm64"]
-  target = "aptos"
+  target = "aptos-node"
   output = ["type=image"]
   args = {
     APTOS_GIT_REVISION = APTOS_GIT_REVISION
   }
+  tags = tags_multi_platform("aptos-node")
+  cache-from = [cache_multi_platform("aptos-node")] # always merged with children's cache-from
+  cache-to = ["${cache_multi_platform("aptos-node")},mode=max"]
+}
+
+target "aptos-multi-platform" {
+  inherits = ["aptos-node-multi-platform"]
+  target = "aptos"
   tags = tags_multi_platform("aptos")
-  cache-from = [cache_multi_platform("aptos")] # always merged with children's cache-from
-  cache-to = ["${cache_multi_platform("aptos")},mode=max"]
+  # Sharing the same cache with aptos-node
 }

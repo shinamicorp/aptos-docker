@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  APTOS_GIT_REVISION: ee0d090   # devnet branch
+  APTOS_GIT_REVISION: 7dc7078
 
 concurrency: docker
 

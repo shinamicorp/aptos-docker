@@ -14,6 +14,8 @@ RUN git clone https://github.com/aptos-labs/aptos-core.git . && \
 RUN ./scripts/dev_setup.sh -t -b -p
 RUN source ~/.profile && \
     cargo build --locked --release --bin aptos
+RUN source ~/.profile && \
+    cargo build --locked --release --package aptos-node
 
 FROM ubuntu:22.04 AS base
 
@@ -36,7 +38,20 @@ COPY --from=builder \
 USER aptos
 WORKDIR /aptos
 
+FROM base AS aptos-node
+
+COPY --from=builder \
+    /usr/src/aptos/target/release/aptos-node \
+    /usr/local/bin/
+
+COPY --from=builder \
+    /usr/lib/* \
+    /usr/lib/
+
+USER aptos
+WORKDIR /aptos
+
 EXPOSE 8080
 EXPOSE 9102
 
-ENTRYPOINT ["aptos", "node", "run-local-testnet"]
+ENTRYPOINT ["aptos-node"]
