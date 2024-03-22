@@ -28,6 +28,7 @@ RUN adduser --uid 1000 --home /aptos --gecos '' --disabled-password aptos
 FROM base AS aptos
 
 COPY --from=builder \
+    /usr/src/aptos/target/release/aptos-node \
     /usr/src/aptos/target/release/aptos \
     /usr/local/bin/
 
