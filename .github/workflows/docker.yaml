@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  APTOS_GIT_REVISION: 7dc7078
+  APTOS_GIT_REVISION: aptos-node-v1.10.0
 
 concurrency: docker
 

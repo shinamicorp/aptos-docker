@@ -2,7 +2,7 @@ FROM ubuntu:22.04 AS builder
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates git && \
+    apt-get install -y --no-install-recommends ca-certificates git sudo && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/aptos
@@ -28,6 +28,7 @@ RUN adduser --uid 1000 --home /aptos --gecos '' --disabled-password aptos
 FROM base AS aptos
 
 COPY --from=builder \
+    /usr/src/aptos/target/release/aptos-node \
     /usr/src/aptos/target/release/aptos \
     /usr/local/bin/
 
