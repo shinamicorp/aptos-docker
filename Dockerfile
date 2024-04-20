@@ -17,6 +17,7 @@ RUN source ~/.profile && \
 RUN source ~/.profile && \
     cargo build --locked --release --package aptos-node
 
+
 FROM ubuntu:22.04 AS base
 
 RUN apt-get update && \
@@ -24,6 +25,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN adduser --uid 1000 --home /aptos --gecos '' --disabled-password aptos
+
+# https://github.com/aptos-labs/aptos-core/blob/a72ef8a716ecf3ab207c8377cb94c9c5aedaf5b4/crates/aptos/src/node/local_testnet/mod.rs#L236
+RUN touch /aptos/.dockerenv
+
 
 FROM base AS aptos
 
@@ -38,6 +43,7 @@ COPY --from=builder \
 
 USER aptos
 WORKDIR /aptos
+
 
 FROM base AS aptos-node
 
