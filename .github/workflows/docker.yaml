@@ -10,12 +10,15 @@ on:
       - main
 
 env:
-  APTOS_GIT_REVISION: aptos-node-v1.10.1
+  APTOS_GIT_REVISION: aptos-node-v1.16.3
 
 concurrency: docker
 
 jobs:
   build_push:
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -61,6 +64,9 @@ jobs:
           PLATFORM: ${{ matrix.platform }}
 
   manifest:
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
