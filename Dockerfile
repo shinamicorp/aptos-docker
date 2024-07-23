@@ -24,7 +24,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends curl ca-certificates procps && \
     rm -rf /var/lib/apt/lists/*
 
-RUN adduser --uid 1000 --home /aptos --gecos '' --disabled-password aptos
+RUN adduser --uid 1002 --home /aptos --gecos '' --disabled-password aptos
 WORKDIR /aptos
 
 # https://github.com/aptos-labs/aptos-core/blob/a72ef8a716ecf3ab207c8377cb94c9c5aedaf5b4/crates/aptos/src/node/local_testnet/mod.rs#L236
