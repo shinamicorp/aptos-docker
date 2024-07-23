@@ -57,6 +57,7 @@ COPY --from=builder \
 
 USER aptos
 
+EXPOSE 6180
 EXPOSE 8080
 EXPOSE 9102
 
