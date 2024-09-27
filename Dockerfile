@@ -25,7 +25,7 @@ RUN git init && \
     git checkout FETCH_HEAD
 
 RUN cargo build --locked --release --bin aptos-node
-RUN cargo build --locked --release --bin aptos
+RUN cargo build --locked --profile cli --bin aptos
 
 
 FROM debian:bookworm-slim AS base
@@ -52,7 +52,6 @@ RUN touch .dockerenv
 FROM base AS aptos
 
 COPY --from=builder \
-    /usr/src/aptos/target/release/aptos-node \
     /usr/src/aptos/target/release/aptos \
     /usr/local/bin/
 
