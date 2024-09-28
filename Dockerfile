@@ -52,7 +52,7 @@ RUN touch .dockerenv
 FROM base AS aptos
 
 COPY --from=builder \
-    /usr/src/aptos/target/release/aptos \
+    /usr/src/aptos/target/cli/aptos \
     /usr/local/bin/
 
 USER aptos
