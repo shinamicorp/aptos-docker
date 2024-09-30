@@ -57,6 +57,8 @@ COPY --from=builder \
 
 USER aptos
 
+ENTRYPOINT ["/usr/local/bin/aptos"]
+
 
 FROM base AS aptos-node
 
@@ -69,4 +71,4 @@ USER aptos
 EXPOSE 8080
 EXPOSE 9101
 
-ENTRYPOINT ["aptos-node"]
+ENTRYPOINT ["/usr/local/bin/aptos-node"]
