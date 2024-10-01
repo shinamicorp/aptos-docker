@@ -2,67 +2,49 @@ variable "APTOS_GIT_REVISION" {}
 
 variable "PLATFORM" {}
 
-function "tags" {
-  params = [target]
-  result = ["ghcr.io/shinamicorp/${target}:${APTOS_GIT_REVISION}-${regex_replace(PLATFORM, "/", "-")}"]
+variable "_PLATFORM_TAG" {
+  default = regex_replace(PLATFORM, "/", "-")
 }
 
-function "tags_multi_platform" {
-  params = [target]
-  result = ["ghcr.io/shinamicorp/${target}:${APTOS_GIT_REVISION}"]
+variable "_REMOTE_CACHE" {
+  default = "type=registry,ref=ghcr.io/shinamicorp/aptos:cache-${_PLATFORM_TAG}"
 }
 
-function "cache" {
+function "tag" {
   params = [target]
-  result = "type=registry,ref=ghcr.io/shinamicorp/${target}:cache-${regex_replace(PLATFORM, "/", "-")}"
+  result = "ghcr.io/shinamicorp/${target}:${APTOS_GIT_REVISION}-${_PLATFORM_TAG}"
 }
 
-function "cache_multi_platform" {
-  params = [target]
-  result = "type=registry,ref=ghcr.io/shinamicorp/${target}:cache"
+target "_common" {
+  platforms = [PLATFORM]
+  args = {
+    APTOS_GIT_REVISION = APTOS_GIT_REVISION
+  }
+  cache-from = ["type=local,src=./cache/${PLATFORM}", _REMOTE_CACHE]
+}
+
+# A cache-only target, just to download/populate the cache.
+target "binaries" {
+  inherits = ["_common"]
+  target   = "binaries"
+  output   = ["type=cacheonly"]
+  cache-to = ["type=local,dest=./cache/${PLATFORM}", _REMOTE_CACHE]
 }
 
 # Single-platform targets.
 # Requires creating multi-platform manifest list manually.
 target "aptos-node" {
-  platforms = [PLATFORM]
-  target = "aptos-node"
-  output = ["type=image"]
-  args = {
-    APTOS_GIT_REVISION = APTOS_GIT_REVISION
-  }
-  tags = tags("aptos-node")
-  cache-from = [cache("aptos-node")] # always merged with children's cache-from
-  cache-to = ["${cache("aptos-node")},mode=max"]
+  inherits = ["_common"]
+  target   = "aptos-node"
+  tags     = [tag("aptos-node")]
 }
 
 target "aptos" {
-  inherits = ["aptos-node"]
-  target = "aptos"
-  tags = tags("aptos")
-  # Sharing the same cache with aptos-node
+  inherits = ["_common"]
+  target   = "aptos"
+  tags     = [tag("aptos")]
 }
 
 target "default" {
   inherits = ["aptos-node"]
-}
-
-# Multi-platform targets.
-target "aptos-node-multi-platform" {
-  platforms = ["linux/amd64", "linux/arm64"]
-  target = "aptos-node"
-  output = ["type=image"]
-  args = {
-    APTOS_GIT_REVISION = APTOS_GIT_REVISION
-  }
-  tags = tags_multi_platform("aptos-node")
-  cache-from = [cache_multi_platform("aptos-node")] # always merged with children's cache-from
-  cache-to = ["${cache_multi_platform("aptos-node")},mode=max"]
-}
-
-target "aptos-multi-platform" {
-  inherits = ["aptos-node-multi-platform"]
-  target = "aptos"
-  tags = tags_multi_platform("aptos")
-  # Sharing the same cache with aptos-node
 }

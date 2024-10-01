@@ -28,7 +28,18 @@ RUN cargo build --locked --release --bin aptos-node
 RUN cargo build --locked --profile cli --bin aptos
 
 
-FROM debian:bookworm-slim AS base
+# To be used as a cache. Much smaller compared to builder.
+FROM debian:bookworm-slim AS binaries
+
+COPY --from=builder \
+    /usr/src/aptos/target/release/aptos-node \
+    /usr/local/bin/
+COPY --from=builder \
+    /usr/src/aptos/target/cli/aptos \
+    /usr/local/bin/
+
+
+FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -49,10 +60,10 @@ WORKDIR /aptos
 RUN touch .dockerenv
 
 
-FROM base AS aptos
+FROM runtime AS aptos
 
-COPY --from=builder \
-    /usr/src/aptos/target/cli/aptos \
+COPY --from=binaries \
+    /usr/local/bin/aptos \
     /usr/local/bin/
 
 USER aptos
@@ -60,10 +71,10 @@ USER aptos
 ENTRYPOINT ["/usr/local/bin/aptos"]
 
 
-FROM base AS aptos-node
+FROM runtime AS aptos-node
 
-COPY --from=builder \
-    /usr/src/aptos/target/release/aptos-node \
+COPY --from=binaries \
+    /usr/local/bin/aptos-node \
     /usr/local/bin/
 
 USER aptos
