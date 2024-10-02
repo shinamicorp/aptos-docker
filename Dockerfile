@@ -24,7 +24,7 @@ RUN git init && \
     git fetch --depth 1 origin ${APTOS_GIT_REVISION} && \
     git checkout FETCH_HEAD
 
-RUN cargo build --locked --release --bin aptos-node
+RUN cargo build --locked --release --package aptos-node
 RUN cargo build --locked --profile cli --bin aptos
 
 
