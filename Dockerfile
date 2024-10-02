@@ -1,5 +1,5 @@
 # Keep up-to-date with https://github.com/aptos-labs/aptos-core/blob/main/rust-toolchain.toml
-FROM rust:1.78.0-slim-bookworm AS builder
+FROM rust:1.78.0-slim-bookworm AS builder-base
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -14,6 +14,9 @@ RUN apt-get update && \
         clang-14 \
         && \
     rm -rf /var/lib/apt/lists/*
+
+
+FROM builder-base AS builder
 
 WORKDIR /usr/src/aptos
 
@@ -39,7 +42,7 @@ COPY --from=builder \
     /usr/local/bin/
 
 
-FROM debian:bookworm-slim AS runtime
+FROM debian:bookworm-slim AS runtime-base
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -60,7 +63,7 @@ WORKDIR /aptos
 RUN touch .dockerenv
 
 
-FROM runtime AS aptos
+FROM runtime-base AS aptos
 
 COPY --from=binaries \
     /usr/local/bin/aptos \
@@ -71,7 +74,7 @@ USER aptos
 ENTRYPOINT ["/usr/local/bin/aptos"]
 
 
-FROM runtime AS aptos-node
+FROM runtime-base AS aptos-node
 
 COPY --from=binaries \
     /usr/local/bin/aptos-node \
