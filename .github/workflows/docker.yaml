@@ -45,10 +45,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Bake binaries and populate cache
+      - name: Bake and populate builder-base cache
+        if: github.event_name == 'push'
         uses: docker/bake-action@v5
         with:
-          targets: binaries
+          targets: cache-builder-base
+        env:
+          PLATFORM: ${{ matrix.platform }}
+
+      - name: Bake and populate runtime-base cache
+        if: github.event_name == 'push'
+        uses: docker/bake-action@v5
+        with:
+          targets: cache-runtime-base
+        env:
+          PLATFORM: ${{ matrix.platform }}
+
+      - name: Bake and populate binaries cache
+        uses: docker/bake-action@v5
+        with:
+          targets: cache-binaries
         env:
           PLATFORM: ${{ matrix.platform }}
 
