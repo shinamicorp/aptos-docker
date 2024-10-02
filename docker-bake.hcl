@@ -6,11 +6,6 @@ variable "_PLATFORM_TAG" {
   default = regex_replace(PLATFORM, "/", "-")
 }
 
-# TODO - delete
-variable "_REMOTE_CACHE_LEGACY" {
-  default = "type=registry,ref=ghcr.io/shinamicorp/aptos:cache-${_PLATFORM_TAG}"
-}
-
 variable "_REMOTE_CACHE_BUILDER_BASE" {
   default = "type=registry,ref=ghcr.io/shinamicorp/aptos:cache-builder-base-${_PLATFORM_TAG}"
 }
@@ -45,7 +40,6 @@ target "_common" {
     _REMOTE_CACHE_BUILDER_BASE,
     _REMOTE_CACHE_RUNTIME_BASE,
     _REMOTE_CACHE_BINARIES,
-    _REMOTE_CACHE_LEGACY,
   ]
 }
 
