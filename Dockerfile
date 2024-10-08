@@ -5,13 +5,12 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         git \
         make \
+        clang \
         lld \
         pkg-config \
-        g++ \
         libssl-dev \
         libudev-dev \
         libdw-dev \
-        clang-14 \
         && \
     rm -rf /var/lib/apt/lists/*
 
@@ -46,13 +45,12 @@ FROM debian:bookworm-slim AS runtime-base
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        curl \
+        ca-certificates \
+        procps \
         libssl3 \
         libudev1 \
         libdw1 \
-        libclang1-14 \
-        procps \
-        curl \
-        ca-certificates \
         && \
     rm -rf /var/lib/apt/lists/*
 
