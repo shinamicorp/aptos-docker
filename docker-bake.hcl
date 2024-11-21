@@ -1,4 +1,4 @@
-variable "APTOS_GIT_REVISION" {}
+variable "APTOS_GIT_REF" {}
 
 variable "PLATFORM" {}
 
@@ -15,12 +15,12 @@ variable "_REMOTE_CACHE_RUNTIME_BASE" {
 }
 
 variable "_REMOTE_CACHE_BINARIES" {
-  default = "type=registry,ref=ghcr.io/shinamicorp/aptos:cache-binaries-${APTOS_GIT_REVISION}-${_PLATFORM_TAG}"
+  default = "type=registry,ref=ghcr.io/shinamicorp/aptos:cache-binaries-${APTOS_GIT_REF}-${_PLATFORM_TAG}"
 }
 
 function "tag" {
   params = [target]
-  result = "ghcr.io/shinamicorp/${target}:${APTOS_GIT_REVISION}-${_PLATFORM_TAG}"
+  result = "ghcr.io/shinamicorp/${target}:${APTOS_GIT_REF}-${_PLATFORM_TAG}"
 }
 
 function "local_cache_dir" {
@@ -31,7 +31,7 @@ function "local_cache_dir" {
 target "_common" {
   platforms = [PLATFORM]
   args = {
-    APTOS_GIT_REVISION = APTOS_GIT_REVISION
+    APTOS_GIT_REF = APTOS_GIT_REF
   }
   cache-from = [
     "type=local,src=${local_cache_dir("builder-base")}",

@@ -10,11 +10,23 @@ on:
       - main
 
 env:
-  APTOS_GIT_REVISION: aptos-node-v1.23.2
+  APTOS_GIT_REF: aptos-node-v1.23.3
 
 concurrency: docker
 
 jobs:
+  prep:
+    runs-on: ubuntu-latest
+    outputs:
+      aptos_git_sha: ${{ steps.checkout.outputs.commit }}
+    steps:
+      - name: Checkout aptos-core
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          repository: aptos-labs/aptos-core
+          ref: ${{ env.APTOS_GIT_REF }}
+
   build_push:
     permissions:
       contents: read
@@ -28,6 +40,10 @@ jobs:
           - runner: ARM64
             platform: linux/arm64
 
+    needs: prep
+    env:
+      APTOS_GIT_REF: ${{ needs.prep.outputs.aptos_git_sha }}
+      PLATFORM: ${{ matrix.platform }}
     runs-on:
       - self-hosted
       - ${{ matrix.runner }}
@@ -50,23 +66,17 @@ jobs:
         uses: docker/bake-action@v5
         with:
           targets: cache-builder-base,cache-runtime-base
-        env:
-          PLATFORM: ${{ matrix.platform }}
 
       - name: Bake and populate binaries cache
         uses: docker/bake-action@v5
         with:
           targets: cache-binaries
-        env:
-          PLATFORM: ${{ matrix.platform }}
 
       - name: Bake images
         uses: docker/bake-action@v5
         with:
           targets: aptos-node,aptos
           push: ${{ github.event_name == 'push' }}
-        env:
-          PLATFORM: ${{ matrix.platform }}
 
   manifest:
     permissions:
@@ -77,7 +87,7 @@ jobs:
       matrix:
         target: [aptos-node, aptos]
 
-    needs: build_push
+    needs: [prep, build_push]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -90,6 +100,6 @@ jobs:
 
       - name: Create manifest
         run: |
-          docker buildx imagetools create -t ghcr.io/shinamicorp/${{ matrix.target }}:${{ env.APTOS_GIT_REVISION }} \
-            ghcr.io/shinamicorp/${{ matrix.target }}:${{ env.APTOS_GIT_REVISION }}-linux-amd64 \
-            ghcr.io/shinamicorp/${{ matrix.target }}:${{ env.APTOS_GIT_REVISION }}-linux-arm64 \
+          docker buildx imagetools create -t ghcr.io/shinamicorp/${{ matrix.target }}:${{ env.APTOS_GIT_REF }} \
+            ghcr.io/shinamicorp/${{ matrix.target }}:${{ needs.prep.outputs.aptos_git_sha }}-linux-amd64 \
+            ghcr.io/shinamicorp/${{ matrix.target }}:${{ needs.prep.outputs.aptos_git_sha }}-linux-arm64 \
