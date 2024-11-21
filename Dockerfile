@@ -20,10 +20,10 @@ FROM builder-base AS builder
 WORKDIR /usr/src/aptos
 
 # Shallow clone of a specific commit
-ARG APTOS_GIT_REVISION
+ARG APTOS_GIT_REF
 RUN git init && \
     git remote add origin https://github.com/aptos-labs/aptos-core.git && \
-    git fetch --depth 1 origin ${APTOS_GIT_REVISION} && \
+    git fetch --depth 1 origin ${APTOS_GIT_REF} && \
     git checkout FETCH_HEAD
 
 RUN cargo build --locked --release --package aptos-node
