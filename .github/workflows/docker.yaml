@@ -18,19 +18,14 @@ jobs:
   prep:
     runs-on: ubuntu-latest
     outputs:
-      aptos_git_sha: ${{ steps.resolve.outputs.aptos_git_sha }}
+      aptos_git_sha: ${{ steps.checkout.outputs.commit }}
     steps:
       - name: Checkout aptos-core
+        id: checkout
         uses: actions/checkout@v4
         with:
           repository: aptos-labs/aptos-core
           ref: ${{ env.APTOS_GIT_REF }}
-
-      - name: Resolve aptos-core commit SHA
-        id: resolve
-        run: |
-          sha=$(git rev-list -n1 HEAD)
-          echo "aptos_git_sha=$sha" | tee -a "$GITHUB_OUTPUT"
 
   build_push:
     permissions:
