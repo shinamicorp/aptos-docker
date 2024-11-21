@@ -18,7 +18,7 @@ jobs:
   prep:
     runs-on: ubuntu-latest
     outputs:
-      aptos_git_sha: $${{ steps.resolve.outputs.aptos_git_sha }}
+      aptos_git_sha: ${{ steps.resolve.outputs.aptos_git_sha }}
     steps:
       - name: Checkout aptos-core
         uses: actions/checkout@v4
