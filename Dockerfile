@@ -1,5 +1,5 @@
 # Keep up-to-date with https://github.com/aptos-labs/aptos-core/blob/main/rust-toolchain.toml
-FROM rust:1.78.0-slim-bookworm AS builder-base
+FROM rust:1.86.0-slim-bookworm AS builder-base
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
