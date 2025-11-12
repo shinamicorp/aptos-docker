@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  APTOS_GIT_REF: aptos-node-v1.37.1-rc
+  APTOS_GIT_REF: aptos-node-v1.38.0-rc
 
 concurrency: docker
 
