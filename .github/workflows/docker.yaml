@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  APTOS_GIT_REF: aptos-node-v1.42.1
+  APTOS_GIT_REF: aptos-node-v1.48.2
 
 concurrency: docker
 
@@ -35,18 +35,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: X64
+          - runner: ubuntu-24.04
             platform: linux/amd64
-          - runner: ARM64
+          - runner: ubuntu-24.04-arm
             platform: linux/arm64
 
     needs: prep
     env:
       APTOS_GIT_REF: ${{ needs.prep.outputs.aptos_git_sha }}
       PLATFORM: ${{ matrix.platform }}
-    runs-on:
-      - self-hosted
-      - ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
